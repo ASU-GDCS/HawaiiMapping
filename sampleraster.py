@@ -4,7 +4,6 @@ import argparse
 import numpy
 
 import rasterio # Use for raster reads
-import fiona # Use this for output
 from osgeo import ogr # Use this for vector input, since it can handle sql queries
 from osgeo import osr # Use this for transforming coordinates from vector to raster CRS
 
@@ -13,7 +12,6 @@ ogr.UseExceptions()
 
 # The following will be used for masking based on features to extract covered pixels
 import shapely.geometry as geom
-import rasterio.mask as mask
 import rasterio.features as feat
 
 import tqdm # for reporting progress
