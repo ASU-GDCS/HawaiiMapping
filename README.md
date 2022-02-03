@@ -2,9 +2,18 @@
 Code for assisting with the Hawaii mapping efforts
 
 ## Scripts
+
 ### _sampleraster.py_
+
+**Prerequisites:**
+* numpy (https://pypi.org/project/numpy)
+* shapely (https://pypi.org/project/Shapely)
+* rasterio (https://pypi.org/project/rasterio)
+* tqdm (https://pypi.org/project/tqdm)
+
+**Usage:**
 ```
-usage: sampleraster.py [-h] [--nodata NODATA] [--sql SQL] [--ignore]
+sampleraster.py [-h] [--nodata NODATA] [--sql SQL] [--ignore]
                        [--alltouched] [--nln NLN] [--format FORMAT]
                        input output rasters [rasters ...]
 
