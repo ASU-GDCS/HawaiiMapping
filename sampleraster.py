@@ -570,7 +570,7 @@ def main():
 
             # Update the point geometry
             ###########################
-            tmppoint.AddPoint(float(tmpdat[pix,4]),float(tmpdat[pix,4]))
+            tmppoint.AddPoint(float(tmpdat[pix,4]),float(tmpdat[pix,5]))
 
             # Translate back if needed
             if gt is not None:
