@@ -526,14 +526,15 @@ def main():
                     indexes=rdict['Bands'],
                     window=feat_window)
 
+            # Copy the raster values to the tmpdat array
+            tmpdat[rdict['Indices'],:] = feat_dat[:,off_r,off_c].reshape(feat_dat.shape[0],-1)
+            
             # Convert nodata to NaN, unless ignore is specified
             if not args.ignore:
                 for bi, b in enumerate(rdict['Bands']):
-                    wnotval = numpy.where(feat_dat[bi,:,:] == rdict['Reference'].nodatavals[b-1])
-                    feat_dat[bi,wnotval[0],wnotval[1]]  = numpy.nan
-
-            # Copy the raster values to the tmpdat array
-            tmpdat[rdict['Indices'],:] = feat_dat[:,off_r,off_c].reshape(feat_dat.shape[0],-1)
+                    ii = rdict['Indices'][bi]
+                    wnotval = numpy.where(tmpdat[ii,:] == rdict['Reference'].nodatavals[b-1])[0]
+                    tmpdat[ii,wnotval]  = numpy.nan
 
         # Clear out any pixels whera all pixel data is nan 
         valpix = numpy.any(numpy.isfinite(tmpdat[metafieldcount:,:]),axis=0)
