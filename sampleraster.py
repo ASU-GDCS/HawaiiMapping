@@ -4,15 +4,17 @@ import argparse
 import numpy
 
 import rasterio # Use for raster reads
+
+# The following will be used for masking based on features to extract covered pixels
+import shapely.geometry as geom
+import rasterio.features as feat
+
 from osgeo import ogr # Use this for vector input, since it can handle sql queries
 from osgeo import osr # Use this for transforming coordinates from vector to raster CRS
 
 # Keep OGR errors from happening siliently
 ogr.UseExceptions()
 
-# The following will be used for masking based on features to extract covered pixels
-import shapely.geometry as geom
-import rasterio.features as feat
 
 import tqdm # for reporting progress
 
@@ -444,13 +446,14 @@ def main():
 
         # Read in the feature's geometry 
         ingeom = infeat.GetGeometryRef()
-        # Check that it is non-null
+        # Check that it is a geometry
         if ingeom is None:
             infeat.Destroy()
             print("feature {} had no geometry".format(featnum))
             sys.stdout.flush()
             continue
         
+
         # If we have a crs transformation, apply it
         if gt is not None:
             ingeom.Transform(gt)
@@ -459,6 +462,13 @@ def main():
         ########################################################
         #Convert the geometry into a shapely shape object
         shapely_geom = geom.shape(eval(ingeom.ExportToJson()))
+        
+        # Check for empties
+        if ingeom.isempty:
+            infeat.Destroy()
+            print("feature {} had no geometry".format(featnum))
+            sys.stdout.flush()
+            continue
 
         # Find which indices would be rasterized by this shape
         ######################################################
