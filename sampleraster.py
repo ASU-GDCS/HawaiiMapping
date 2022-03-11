@@ -463,13 +463,6 @@ def main():
         #Convert the geometry into a shapely shape object
         shapely_geom = geom.shape(eval(ingeom.ExportToJson()))
         
-        # Check for empties
-        if ingeom.isempty:
-            infeat.Destroy()
-            print("feature {} had no geometry".format(featnum))
-            sys.stdout.flush()
-            continue
-
         # Find which indices would be rasterized by this shape
         ######################################################
         # Get the window for this feature
