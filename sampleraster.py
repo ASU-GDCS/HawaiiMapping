@@ -433,13 +433,18 @@ def main():
     # A point that we can modify over and over
     tmppoint = ogr.Geometry(ogr.wkbPoint)
 
+    # Start a batch of changes
+    outlayer.StartTransaction()
+    # Keep track of transactions
+    num_trans = 0
+
     ## Iterate through features, grabbing data from maps 
     #####################################################
     for featnum, infeat in tqdm.tqdm(enumerate(inlayer),
                                     desc="Checking features ",
                                     ncols=80,
                                     total=infeatcount,
-                                    maxinterval=0.1):
+                                    mininterval=1):
         # Check for missing features
         if infeat is None:
             continue
@@ -543,8 +548,6 @@ def main():
         valpix = numpy.any(numpy.isfinite(tmpdat[metafieldcount:,:]),axis=0)
         tmpdat = tmpdat[:,valpix].T
 
-        # Start a batch of changes for this feature
-        outlayer.StartTransaction()
 
         ##########################################################
         ## For each valid pixel, create a new output point feature
@@ -570,6 +573,7 @@ def main():
             # Set data fields
             for datfield in range(tmpdat.shape[1]-metafieldcount):
                 outfeat.SetField(datfield+infieldcount+metafieldcount,float(tmpdat[pix,datfield+metafieldcount]))
+                num_trans += 1
 
             # Update the point geometry
             ###########################
@@ -590,12 +594,18 @@ def main():
 
             outfeat = None
 
-        # Apply all additions for this feature
-        outlayer.CommitTransaction()
+            # If we reached our buffer size, apply all waiting transactions
+            if num_trans > 5000:
+                outlayer.CommitTransaction()
+                outlayer.StartTransaction()
+                num_trans = 0
 
         # Clean up
         infeat = None
         ingeom = None
+
+    ##One final commit 
+    outlayer.CommitTransaction()
 
     outlayer = None
 
