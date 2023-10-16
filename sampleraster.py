@@ -535,7 +535,10 @@ def main():
                     window=feat_window)
 
             # Copy the raster values to the tmpdat array
-            tmpdat[rdict['Indices'],:] = feat_dat[:,off_r,off_c].reshape(feat_dat.shape[0],-1)
+            try:
+                tmpdat[rdict['Indices'],:] = feat_dat[:,off_r,off_c].reshape(feat_dat.shape[0],-1)
+            except IndexError:
+                tmpdat[rdict['Indices'],:] = numpy.nan
             
             # Convert nodata to NaN, unless ignore is specified
             if not args.ignore:
